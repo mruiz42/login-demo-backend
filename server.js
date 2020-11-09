@@ -13,6 +13,9 @@ const {
 const app = express();
 const port = process.env.PORT || 4000;
 
+const User = require('./models/user')
+const { Op } = require('sequelize')
+const user_ctl = require('./controllers/user_controller')
 // list of the users to be consider as a database for example
 const userList = [
     {
@@ -43,6 +46,7 @@ app.use(cors({
     origin: 'http://localhost:3000', // url of the frontend application
     credentials: true // set credentials true for secure httpOnly cookie
 }));
+
 // parse application/json
 app.use(bodyParser.json());
 // parse application/x-www-form-urlencoded
@@ -192,7 +196,10 @@ app.get('/users/getList', authMiddleware, (req, res) => {
     return handleResponse(req, res, 200, { random: Math.random(), userList: list });
 });
 
+app.post('/user', user_ctl.findOne);
+
 
 app.listen(port, () => {
     console.log('Server started on: ' + port);
+
 });
