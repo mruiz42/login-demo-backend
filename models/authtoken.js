@@ -1,25 +1,25 @@
 const Sequelize = require('sequelize');
 const sql = require('../utils/database');
 
-const User = sql.define('User', {
+const AuthToken = sql.define('AuthToken', {
     id: {
         type: Sequelize.INTEGER,
-        primaryKey: true,
+        foreignKey: true,
         unique: true,
         allowNull: false,
         autoIncrement: true
     },
-    name: {
+    token: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: false
     },
-    username: {
+    expireAt: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true
     },
-    email: {
+    xsrfToken: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true

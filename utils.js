@@ -23,10 +23,10 @@ function generateToken(user) {
     if (!user) return null;
 
     const u = {
-        userId: user.userId,
+        userId: user.id,
         name: user.name,
         username: user.username,
-        isAdmin: user.isAdmin
+        email: user.email
     };
 
     // generat xsrf token and use it to generate access token

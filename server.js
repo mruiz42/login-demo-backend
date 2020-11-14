@@ -17,29 +17,6 @@ const User = require('./models/user')
 const { Op } = require('sequelize')
 const user_ctl = require('./controllers/user_controller')
 // list of the users to be consider as a database for example
-const userList = [
-    {
-        userId: "123",
-        password: "clue1",
-        name: "Clue",
-        username: "clue",
-        isAdmin: true
-    },
-    {
-        userId: "456",
-        password: "mediator",
-        name: "Mediator",
-        username: "mediator",
-        isAdmin: true
-    },
-    {
-        userId: "789",
-        password: "123456",
-        name: "Clue Mediator",
-        username: "cluemediator",
-        isAdmin: true
-    }
-]
 
 // enable CORS
 app.use(cors({
@@ -90,45 +67,45 @@ const authMiddleware = function (req, res, next) {
 }
 
 
-// validate user credentials
-app.post('/login', function (req, res) {
-    const user = req.body.username;
-    const pwd = req.body.password;
-
-    // return 400 status if username/password is not exist
-    if (!user || !pwd) {
-        return handleResponse(req, res, 400, null, "Username and Password required.");
-    }
-
-    const userData = userList.find(x => x.username === user && x.password === pwd);
-
-    // return 401 status if the credential is not matched
-    if (!userData) {
-        return handleResponse(req, res, 401, null, "Username or Password is Wrong.");
-    }
-
-    // get basic user details
-    const userObj = getCleanUser(userData);
-
-    // generate access token
-    const tokenObj = generateToken(userData);
-
-    // generate refresh token
-    const refreshToken = generateRefreshToken(userObj.userId);
-
-    // refresh token list to manage the xsrf token
-    refreshTokens[refreshToken] = tokenObj.xsrfToken;
-
-    // set cookies
-    res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
-    res.cookie('XSRF-TOKEN', tokenObj.xsrfToken);
-
-    return handleResponse(req, res, 200, {
-        user: userObj,
-        token: tokenObj.token,
-        expiredAt: tokenObj.expiredAt
-    });
-});
+// // validate user credentials
+// app.post('/login', function (req, res) {
+//     const user = req.body.username;
+//     const pwd = req.body.password;
+//
+//     // return 400 status if username/password is not exist
+//     if (!user || !pwd) {
+//         return handleResponse(req, res, 400, null, "Username and Password required.");
+//     }
+//
+//     const userData = user_ctl.findOne(req, res);
+//
+//     // return 401 status if the credential is not matched
+//     if (!userData) {
+//         return handleResponse(req, res, 401, null, "Username or Password is Wrong.");
+//     }
+//
+//     // get basic user details
+//     const userObj = getCleanUser(userData);
+//
+//     // generate access token
+//     const tokenObj = generateToken(userData);
+//
+//     // generate refresh token
+//     const refreshToken = generateRefreshToken(userObj.userId);
+//
+//     // refresh token list to manage the xsrf token
+//     refreshTokens[refreshToken] = tokenObj.xsrfToken;
+//
+//     // set cookies
+//     res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
+//     res.cookie('XSRF-TOKEN', tokenObj.xsrfToken);
+//
+//     return handleResponse(req, res, 200, {
+//         user: userObj,
+//         token: tokenObj.token,
+//         expiredAt: tokenObj.expiredAt
+//     });
+// });
 
 
 // handle user logout
@@ -196,10 +173,12 @@ app.get('/users/getList', authMiddleware, (req, res) => {
     return handleResponse(req, res, 200, { random: Math.random(), userList: list });
 });
 
-app.post('/user', user_ctl.findOne);
+app.post('/login', (req, res) => user_ctl.authenticate(req, res));
 
 
 app.listen(port, () => {
     console.log('Server started on: ' + port);
 
 });
+// User.sync({force: true})
+app.post('/register', user_ctl.create);
