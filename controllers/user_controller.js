@@ -1,6 +1,6 @@
 const User = require('../models/user');
-const { Op } = require('sequelize')
-
+const { Op } = require('sequelize');
+const AuthToken = require('./authtoken_controller')
 const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
     getCleanUser, verifyToken, clearTokens, handleResponse,

@@ -2,12 +2,12 @@ const Sequelize = require('sequelize');
 const sql = require('../utils/database');
 
 const AuthToken = sql.define('AuthToken', {
-    id: {
+    userid: {
         type: Sequelize.INTEGER,
-        foreignKey: true,
+        foreignKey: 'user',
+        sourceKey: 'id',
         unique: true,
         allowNull: false,
-        autoIncrement: true
     },
     token: {
         type: Sequelize.STRING,
@@ -15,27 +15,15 @@ const AuthToken = sql.define('AuthToken', {
         unique: false
     },
     expireAt: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
         allowNull: false,
-        unique: true
+        unique: false
     },
     xsrfToken: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
-    },
-    password: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    verified: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    },
-    // Timestamps
-    createdAt: Sequelize.DATE,
-    updatedAt: Sequelize.DATE
+        unique: false
+    }
 });
 
-module.exports = User
+module.exports = AuthToken

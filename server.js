@@ -16,6 +16,8 @@ const port = process.env.PORT || 4000;
 const User = require('./models/user')
 const { Op } = require('sequelize')
 const user_ctl = require('./controllers/user_controller')
+const authtoken_ctl = require('./controllers/authtoken_controller')
+
 // list of the users to be consider as a database for example
 
 // enable CORS
@@ -182,3 +184,5 @@ app.listen(port, () => {
 });
 // User.sync({force: true})
 app.post('/register', user_ctl.create);
+
+app.post('/syncAuth', authtoken_ctl.sync)
