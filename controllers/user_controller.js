@@ -1,6 +1,5 @@
 const User = require('../models/user');
 const { Op } = require('sequelize');
-const AuthToken = require('./authtoken_controller')
 const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
     getCleanUser, verifyToken, clearTokens, handleResponse,
@@ -83,7 +82,6 @@ exports.authenticate = (req, res) => {
             console.log(newToken);
             res.send(newToken);
             newToken.id = user.id;
-            AuthToken.create(newToken);
         })
     }
 }

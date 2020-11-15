@@ -14,7 +14,6 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const user_ctl = require('../controllers/user_controller')
-const authtoken_ctl = require('./controllers/authtoken_controller')
 
 // list of the users to be consider as a database for example
 
@@ -183,7 +182,3 @@ app.listen(port, () => {
 // const AuthToken = require('./models/authtoken');
 // AuthToken.sync({force:true})
 app.post('/register', user_ctl.create);
-
-app.post('/syncAuth', authtoken_ctl.sync)
-// test if user accesses private route
-app.post('/dashboard', authtoken_ctl.validate)
