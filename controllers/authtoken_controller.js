@@ -1,11 +1,12 @@
 const AuthToken = require('../models/authtoken');
 const { Op } = require('sequelize');
 
-exports.create = (token) => {
-    id = req.body.id;
-    token = req.body.token;
-    expireAt = req.body.expireAt;
-    xsrfToken = req.body.xsrfToken;
+exports.create = (tkn) => {
+    //this is wrong
+    id = tkn.id;
+    token = tkn.token;
+    expireAt = tkn.expireAt;
+    xsrfToken = tkn.xsrfToken;
     if (!id || !token || !expireAt || !xsrfToken) {
         console.log("Token data is null and cannot be verified.");
         return;

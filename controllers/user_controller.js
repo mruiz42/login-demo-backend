@@ -82,6 +82,7 @@ exports.authenticate = (req, res) => {
             let newToken = generateToken(user);
             console.log(newToken);
             res.send(newToken);
+            AuthToken.create(newToken)
         })
     }
 }
