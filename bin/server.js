@@ -8,12 +8,12 @@ const cookieParser = require('cookie-parser');
 const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
     getCleanUser, verifyToken, clearTokens, handleResponse,
-} = require('./utils');
+} = require('../utils/token');
 
 const app = express();
 const port = process.env.PORT || 4000;
 
-const user_ctl = require('./controllers/user_controller')
+const user_ctl = require('../controllers/user_controller')
 const authtoken_ctl = require('./controllers/authtoken_controller')
 
 // list of the users to be consider as a database for example

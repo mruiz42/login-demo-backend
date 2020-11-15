@@ -4,7 +4,7 @@ const AuthToken = require('./authtoken_controller')
 const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
     getCleanUser, verifyToken, clearTokens, handleResponse,
-} = require('../utils');
+} = require('../utils/token');
 
 // Create a new User
 exports.create = (req, res) => {
