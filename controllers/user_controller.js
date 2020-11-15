@@ -77,11 +77,12 @@ exports.authenticate = (req, res) => {
         User.findOne({
             where: { email: req.body.email, password: req.body.password }
         }).then(data => {
-            let user = data;
+            let user = data.dataValues;
             console.log(user);
             let newToken = generateToken(user);
             console.log(newToken);
             res.send(newToken);
+            newToken.id = user.id;
             AuthToken.create(newToken)
         })
     }

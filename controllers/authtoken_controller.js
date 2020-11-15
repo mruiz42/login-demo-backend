@@ -5,7 +5,7 @@ exports.create = (tkn) => {
     //this is wrong
     id = tkn.id;
     token = tkn.token;
-    expireAt = tkn.expireAt;
+    expireAt = tkn.expiredAt;
     xsrfToken = tkn.xsrfToken;
     if (!id || !token || !expireAt || !xsrfToken) {
         console.log("Token data is null and cannot be verified.");
@@ -13,7 +13,7 @@ exports.create = (tkn) => {
     }
     else {
         AuthToken.create({
-            id: id,
+            userid: id,
             token: token,
             expireAt: expireAt,
             xsrfToken: xsrfToken
