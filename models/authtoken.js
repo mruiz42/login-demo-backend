@@ -6,7 +6,7 @@ const AuthToken = sql.define('AuthToken', {
         type: Sequelize.INTEGER,
         foreignKey: 'user',
         sourceKey: 'id',
-        unique: true,
+        unique: false,
         allowNull: false,
     },
     token: {

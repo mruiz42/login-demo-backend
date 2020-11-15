@@ -13,8 +13,6 @@ const {
 const app = express();
 const port = process.env.PORT || 4000;
 
-const User = require('./models/user')
-const { Op } = require('sequelize')
 const user_ctl = require('./controllers/user_controller')
 const authtoken_ctl = require('./controllers/authtoken_controller')
 
@@ -30,7 +28,6 @@ app.use(cors({
 app.use(bodyParser.json());
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-
 // use cookie parser for secure httpOnly cookie
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
@@ -183,6 +180,10 @@ app.listen(port, () => {
 
 });
 // User.sync({force: true})
+// const AuthToken = require('./models/authtoken');
+// AuthToken.sync({force:true})
 app.post('/register', user_ctl.create);
 
 app.post('/syncAuth', authtoken_ctl.sync)
+// test if user accesses private route
+app.post('/dashboard', authtoken_ctl.validate)

@@ -83,7 +83,7 @@ exports.authenticate = (req, res) => {
             console.log(newToken);
             res.send(newToken);
             newToken.id = user.id;
-            AuthToken.create(newToken)
+            AuthToken.create(newToken);
         })
     }
 }

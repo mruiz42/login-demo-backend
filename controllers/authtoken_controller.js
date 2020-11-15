@@ -1,4 +1,5 @@
 const AuthToken = require('../models/authtoken');
+const {handleResponse} = require("../utils");
 const { Op } = require('sequelize');
 
 exports.create = (tkn) => {
@@ -20,9 +21,40 @@ exports.create = (tkn) => {
         })
     }
 }
-
+exports.delete = (tkn) => {
+    token = tkn
+}
 exports.validate = (req, res) => {
+    let reqToken = req.headers['authorization'];
+    if (!reqToken) return handleResponse(req, res, 401);
+    reqToken = reqToken.replace('Bearer ', '');
 
+    AuthToken.findAll({
+        where: {
+            token: reqToken
+        }
+    }).then(data => {
+        if (!data) {
+            console.log("Access denied.")
+            return;
+        }
+        else {
+            const timeNow = new Date();
+            for (const i in data) {
+                if (data[i].dataValues.expireAt >= timeNow) {
+                    // if stored token expired already
+                    console.log("invalid");
+
+                }
+                else {
+
+                }
+            }
+
+            console.log("User permitted")
+            res.send({data});
+        }
+    })
 }
 
 exports.sync = (req, res) => {
