@@ -112,7 +112,11 @@ app.post('/logout', (req, res) => {
     return handleResponse(req, res, 204);
 });
 
-
+app.get('/jwt', (req, res) => {
+    token = generateToken('johndoe')
+    res.cookie('token', token, { httpOnly: true});
+    res.json({token});
+});
 // verify the token and return new tokens if it's valid
 app.post('/verify', function (req, res) {
 
@@ -160,7 +164,6 @@ app.post('/verify', function (req, res) {
 
 });
 
-
 // get list of the users
 app.get('/users/getList', authMiddleware, (req, res) => {
     const list = userList.map(x => {
@@ -171,14 +174,27 @@ app.get('/users/getList', authMiddleware, (req, res) => {
     return handleResponse(req, res, 200, { random: Math.random(), userList: list });
 });
 
-app.post('/login', (req, res) => user_ctl.authenticate(req, res));
+app.post('/login',
+    (req, res) => user_ctl.authenticateCredentials(req, res));
 
+app.post('/auth',
+    (req, res) => verifyToken(req));
 
 app.listen(port, () => {
     console.log('Server started on: ' + port);
+});
+
+app.get('/api', (req, res) => {
+    if (!req.cookies.token) return handleResponse(req, res, 401);
+    // validate token
+    let token = req.cookies.token;
+    if (verifyToken(token.token)) {
+    res.send("Welcome " ) }
+    else {
+        res.send("bye")
+    }
 
 });
 // User.sync({force: true})
-// const AuthToken = require('./models/authtoken');
-// AuthToken.sync({force:true})
 app.post('/register', user_ctl.create);
+

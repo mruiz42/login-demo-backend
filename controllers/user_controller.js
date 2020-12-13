@@ -1,9 +1,12 @@
 const User = require('../models/user');
 const { Op } = require('sequelize');
+
 const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
     getCleanUser, verifyToken, clearTokens, handleResponse,
 } = require('../utils/token');
+
+
 
 // Create a new User
 exports.create = (req, res) => {
@@ -65,7 +68,7 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.authenticate = (req, res) => {
+exports.authenticateCredentials = (req, res) => {
     const credential = null;
     // If user does not enter a username or password
     if (!req.body.email || !req.body.password) {
@@ -80,12 +83,17 @@ exports.authenticate = (req, res) => {
             console.log(user);
             let newToken = generateToken(user);
             console.log(newToken);
+            res.cookie('token', newToken, {httpOnly: true} )
             res.send(newToken);
             newToken.id = user.id;
         })
     }
 }
 
+exports.authenticateToken = (req, res) => {
+    token = req.token;
+
+}
 //
 // // Update a Tutorial by the id in the request
 // exports.update = (req, res) => {
