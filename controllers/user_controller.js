@@ -1,5 +1,7 @@
 const User = require('../models/user');
 const { Op } = require('sequelize');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
@@ -11,7 +13,7 @@ const {hash, compare} = require('../utils/crypto')
 exports.create = (req, res) => {
     // Check if req has the content we need
     if (!req.body.username || !req.body.email || !req.body.password || !req.body.name) {
-        console.log("Request cannot be empty")
+        console.log("Request cannot be empty");
         handleResponse(req, res, 400, null, "Missing required field")
         return;
     }
@@ -32,27 +34,31 @@ exports.create = (req, res) => {
         // If it does not we can proceed to adding the user to database
         else {
             // TODO: Salt and hash password
-            const hash = hash(req.body.password)
-
-            // TODO: validate email, user and password to conform to 255 varchar constraints
-            User.create({
-                username: req.body.username,
-                email: req.body.email,
-                name: req.body.name,
-                password: hash
-            })
-                .then(data => {
-                    res.send(data)
-                })
-                .catch(err => {
-                    res.status(500).send({
-                        message:
-                            err.message || "Some error occurred while creating user."
-                    });
+            console.log("Salt password")
+            bcrypt.genSalt(saltRounds, function (err, salt) {
+                console.log("Hash password")
+                bcrypt.hash(req.body.password, salt).then(function(hash) {
+                    console.log("Store hashed password")
+                    // TODO: validate email, user and password to conform to 255 varchar constraints
+                    User.create({
+                        username: req.body.username,
+                        email: req.body.email,
+                        name: req.body.name,
+                        password: hash
+                    })
+                        .then(data => {
+                            handleResponse(req, res, 200, null, "OK")
+                        })
+                        .catch(err => {
+                            res.status(500).send({
+                                message:
+                                    err.message || "Some error occurred while creating user."
+                            });
+                        });
                 });
+            })
         }
     });
-
 };
 // Find a single User
 exports.findOne = (req, res) => {
@@ -77,34 +83,32 @@ exports.authenticateCredentials = (req, res) => {
         return handleResponse(req, res, 400, null, "Username and Password required.");
       }
     else {
-        hash(req.body.password).then(r => {
-            User.findOne({
-                where: { email: req.body.email, password: r }
-            }).then(data => {
-                if (data === null) {
-                    console.log("not found");
-                    return handleResponse(req, res, 401, null, "Unrecognized username or password.");
-                }
-                else {
-                    let user = data.dataValues;
-                    console.log(user);
-                    const result = compare(r, data.dataValues.password).then(r2 => {
-                        if (r2) {
-                            let newToken = generateToken(user);
-                            console.log(newToken);
-                            res.cookie('token', newToken, {httpOnly: true});
-                            res.send(newToken);
-                            newToken.id = user.id;
-                        }
-                        else {
-                            return handleResponse(req, res, 401, null, "Unrecognized username or password.");
-                        }
-                    })
+        User.findOne({
+            where: { email: req.body.email}
+        }).then(data => {
+            if (data === null) {
+                console.log("not found");
+                return handleResponse(req, res, 401, null, "Unrecognized username or password.");
+            }
+            else {
+                let user = data.dataValues;
+                let hash = data.dataValues.password;
+                bcrypt.compare(req.body.password, hash).then(function(result) {
+                    if (result) {
+                        console.log(user);
+                        let newToken = generateToken(user);
+                        console.log(newToken);
+                        res.cookie('token', newToken, {httpOnly: true});
+                        res.send(newToken);
+                        newToken.id = user.id;
+                    }
+                    else {
+                        handleResponse(req, res, 600, null, "Invalid credential.")
+                    }
+                })
 
-                }
-            })
+            }
         })
-
     }
 }
 
