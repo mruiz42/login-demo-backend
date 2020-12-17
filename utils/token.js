@@ -84,7 +84,7 @@ function handleResponse(req, res, statusCode, data, message) {
         case 401:
             isError = true;
             errorMessage = message || 'Invalid user.';
-            clearTokens(req, res);
+            // clearTokens(req, res);
             break;
         case 403:
             isError = true;

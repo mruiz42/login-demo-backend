@@ -6,5 +6,6 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     host: config.host,
     dialect: config.dialect
 });
+// Uncomment this line to initialize the database for the first time
 // sequelize.sync()
 module.exports = sequelize

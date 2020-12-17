@@ -12,7 +12,8 @@ const {hash, compare} = require('../utils/crypto')
 // Create a new User
 exports.create = (req, res) => {
     // Check if req has the content we need
-    if (!req.body.username || !req.body.email || !req.body.password || !req.body.name) {
+    if (!req.body.username || !req.body.name || !req.body.email || !req.body.password) {
+        console.log(req)
         console.log("Request cannot be empty");
         handleResponse(req, res, 400, null, "Missing required field")
         return;
@@ -88,7 +89,7 @@ exports.authenticateCredentials = (req, res) => {
         }).then(data => {
             if (data === null) {
                 console.log("not found");
-                return handleResponse(req, res, 401, null, "Unrecognized username or password.");
+                return handleResponse(req, res, 401, null, '');
             }
             else {
                 let user = data.dataValues;
