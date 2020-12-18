@@ -12,12 +12,13 @@ const {
 
 // Express js server
 const app = express();
-const port = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4000;
 // User controller for sql commands
 const user_ctl = require('../controllers/user_controller');
 // enable CORS
+const ORIGIN = process.env.FRONTEND_HOST_URL
 app.use(cors({
-    origin: 'http://localhost:3000', // url of the frontend application
+    origin: ORIGIN, // url of the frontend application
     credentials: true // set credentials true for secure httpOnly cookie
 }));
 // parse application/json
@@ -133,8 +134,8 @@ app.post('/login',
 app.post('/auth',
     (req, res) => verifyToken(req));
 
-app.listen(port, () => {
-    console.log('Server started on: ' + port);
+app.listen(PORT, () => {
+    console.log('Server started on: ' + PORT);
 });
 
 app.get('/api', (req, res) => {

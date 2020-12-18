@@ -94,18 +94,19 @@ exports.authenticateCredentials = (req, res) => {
             else {
                 let user = data.dataValues;
                 let hash = data.dataValues.password;
-                bcrypt.compare(req.body.password, hash).then(function(result) {
-                    if (result) {
-                        console.log(user);
-                        let newToken = generateToken(user);
-                        console.log(newToken);
-                        res.cookie('token', newToken, {httpOnly: true});
-                        res.send(newToken);
-                        newToken.id = user.id;
-                    }
-                    else {
-                        handleResponse(req, res, 600, null, "Invalid credential.")
-                    }
+                bcrypt.compare(req.body.password, hash)
+                    .then(function(result) {
+                        if (result) {
+                            console.log(user);
+                            let newToken = generateToken(user);
+                            console.log(newToken);
+                            res.cookie('token', newToken, {httpOnly: true});
+                            res.send(newToken);
+                            newToken.id = user.id;
+                        }
+                        else {
+                            handleResponse(req, res, 600, null, "Invalid credential.")
+                        }
                 })
 
             }
