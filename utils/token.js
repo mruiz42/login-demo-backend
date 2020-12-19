@@ -91,6 +91,10 @@ function handleResponse(req, res, statusCode, data, message) {
             errorMessage = message || 'Access to this resource is denied.';
             clearTokens(req, res);
             break;
+        case 404:
+            isError = true;
+            errorMessage = message || 'Not found';
+            clearTokens(req, res);
         default:
             break;
     }

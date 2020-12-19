@@ -28,7 +28,7 @@ exports.create = (req, res) => {
         }
     }).then(r => {
         if (r) {
-            handleResponse(req, res, 400, null, "User exists");
+            handleResponse(req, res, 401, null, "Username or email already exists.");
             console.log("User credentials already exist");
             return;
         }
@@ -105,7 +105,8 @@ exports.authenticateCredentials = (req, res) => {
                             newToken.id = user.id;
                         }
                         else {
-                            handleResponse(req, res, 600, null, "Invalid credential.")
+                            console.log("Invalid password entered.")
+                            handleResponse(req, res, 403, null, "Unrecognized email or password.")
                         }
                 })
 

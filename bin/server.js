@@ -129,7 +129,8 @@ app.get('/users/getList', authMiddleware, (req, res) => {
 });
 
 app.post('/login',
-    (req, res) => user_ctl.authenticateCredentials(req, res));
+    (req, res) =>
+        user_ctl.authenticateCredentials(req, res));
 
 app.post('/auth',
     (req, res) => verifyToken(req));
