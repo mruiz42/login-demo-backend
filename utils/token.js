@@ -76,6 +76,10 @@ function handleResponse(req, res, statusCode, data, message) {
     let isError = false;
     let errorMessage = message;
     switch (statusCode) {
+        case 200:
+            isError = false;
+            errorMessage = message || 'OK';
+            break;
         case 204:
             return res.sendStatus(204);
         case 400:

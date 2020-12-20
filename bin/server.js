@@ -150,6 +150,6 @@ app.get('/api', (req, res) => {
     }
 
 });
-// User.sync({force: true})
+
 app.post('/register', user_ctl.create);
 

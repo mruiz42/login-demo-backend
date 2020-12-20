@@ -97,12 +97,22 @@ exports.authenticateCredentials = (req, res) => {
                 bcrypt.compare(req.body.password, hash)
                     .then(function(result) {
                         if (result) {
+                            // Construct 'client-safe' user variable
+                            const client_safe_user = {
+                                'username': user.username,
+                                'name': user.name,
+                                'email': user.email,
+
+                            }
                             console.log(user);
-                            let newToken = generateToken(user);
-                            console.log(newToken);
-                            res.cookie('token', newToken, {httpOnly: true});
-                            res.send(newToken);
-                            newToken.id = user.id;
+                            let newToken_json = generateToken(user);
+                            console.log(newToken_json);
+                            // res.send()
+                            res.cookie('token', newToken_json, {httpOnly: true});
+                            res.cookie('user', client_safe_user, {httpOnly: true});
+                            // handleResponse(req,res,200,null,'OK');
+                            res.send({'token': newToken_json, 'user': client_safe_user})
+                            // newToken.id = user.id;
                         }
                         else {
                             console.log("Invalid password entered.")
@@ -113,10 +123,5 @@ exports.authenticateCredentials = (req, res) => {
             }
         })
     }
-}
-
-exports.authenticateToken = (req, res) => {
-    token = req.token;
-
 }
 
