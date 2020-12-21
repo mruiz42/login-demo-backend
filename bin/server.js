@@ -74,7 +74,7 @@ app.get('/jwt', (req, res) => {
 // verify the token and return new tokens if it's valid
 app.post('/verify', function (req, res) {
 
-    const { signedCookies = {} } = req;
+    const { signedCookies = {} } = req.cookies;
     const { refreshToken } = signedCookies;
     if (!refreshToken) {
         return handleResponse(req, res, 204);

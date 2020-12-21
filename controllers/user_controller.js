@@ -102,16 +102,12 @@ exports.authenticateCredentials = (req, res) => {
                                 'username': user.username,
                                 'name': user.name,
                                 'email': user.email,
-
                             }
                             console.log(user);
-                            let newToken_json = generateToken(user);
-                            console.log(newToken_json);
-                            // res.send()
-                            res.cookie('token', newToken_json, {httpOnly: true});
-                            res.cookie('user', client_safe_user, {httpOnly: true});
+                            let token = generateToken(user);
+                            // res.cookie('token', token, {httpOnly: true});
                             // handleResponse(req,res,200,null,'OK');
-                            res.send({'token': newToken_json, 'user': client_safe_user})
+                            return res.json({user: client_safe_user, token});
                             // newToken.id = user.id;
                         }
                         else {

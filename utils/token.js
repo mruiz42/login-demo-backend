@@ -32,7 +32,7 @@ function generateToken(user) {
     // generat xsrf token and use it to generate access token
     const xsrfToken = randtoken.generate(24);
     // create private key by combining JWT secret and xsrf token
-    const privateKey = process.env.JWT_SECRET ;//+ xsrfToken;
+    const privateKey = process.env.JWT_SECRET + xsrfToken;
     // generate access token and expiry date
     const token = jwt.sign(userData, privateKey, { expiresIn: process.env.ACCESS_TOKEN_LIFE });
     // expiry time of the access token
@@ -54,7 +54,7 @@ function generateRefreshToken(userId) {
 // verify access token and refresh token
 function verifyToken(token, xsrfToken = '', cb) {
     var cb = ''
-    const privateKey = process.env.JWT_SECRET;// + xsrfToken;
+    const privateKey = process.env.JWT_SECRET + xsrfToken;
     return jwt.verify(token, privateKey, cb);
 
 }
