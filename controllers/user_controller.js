@@ -98,19 +98,30 @@ exports.authenticateCredentials = (req, res) => {
                         if (result) {
                             // Construct 'client-safe' user variable
                             const safe_user = {
+                                'id': user.id,
                                 'username': user.username,
                                 'name': user.name,
                                 'email': user.email,
                             }
                             console.log("User: " + safe_user.username + " authenticated.");
                             const session_id = uuid.v4()
-                            await tedis.set(safe_user.username, session_id).then(r => {
-                                res.cookie('sid', session_id, {httpOnly: true});
-                                handleResponse(req, res, 200, null, "Success")
+                            await tedis.lpush(safe_user.id, session_id)
+                                .then(result => {
+                                    if (result === "OK") {
+                                        res.cookie('sid', session_id, {httpOnly: true});
+                                        return handleResponse(req, res, 200, null, "Success")
+                                    }
+                                    else {
+                                        return handleResponse(req, res, 403, null, "Redis error.")
+                                    }
                             })
+                                .catch( e => {
+                                    console.log(e);
+                                    return;
+                                })
                         }
                         else {
-                            handleResponse(req, res, 403, null, "Unrecognized email or password.")
+                            return handleResponse(req, res, 403, null, "Unrecognized email or password.")
                         }
                 })
             }

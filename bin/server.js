@@ -8,6 +8,7 @@ const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
     getCleanUser, verifyToken, clearTokens, handleResponse,
 } = require('../utils/token');
+const tedis = require("../utils/tedis");
 
 
 // Express js server
@@ -39,7 +40,27 @@ app.post('/logout', (req, res) => {
 
 
 // verify the token and return new tokens if it's valid
-app.post('/verify', function (req, res) {
+app.post('/verify', async function (req, res) {
+    const cookie = req.cookies
+    // Check if cookie contains an existing session id
+    if (!cookie.sid) {
+        return handleResponse(req, res, 401, null, "Fresh session.");
+    }
+    else {
+        // validate session in redis server
+        await tedis.get(cookie.sid)
+            .then(result => {
+                if (!res) {
+                    return handleResponse(req, res, 402, null, "No redis")
+                }
+                else {
+                    return handleResponse(req, res, 402, null, result)
+                    }
+        })
+            .catch(e => {
+                return handleResponse(req, res, 402, null, e)
+        })
+    }
 
 });
 
