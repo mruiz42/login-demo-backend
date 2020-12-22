@@ -7,8 +7,8 @@ const {
     refreshTokens, COOKIE_OPTIONS, generateToken, generateRefreshToken,
     getCleanUser, verifyToken, clearTokens, handleResponse,
 } = require('../utils/token');
-const {hash, compare} = require('../utils/crypto')
-
+const tedis = require("../utils/tedis");
+const uuid = require("uuid");
 // Create a new User
 exports.create = (req, res) => {
     // Check if req has the content we need
@@ -80,42 +80,39 @@ exports.findOne = (req, res) => {
 exports.authenticateCredentials = (req, res) => {
     // If user does not enter a username or password
     if (!req.body.email || !req.body.password) {
-        console.log("user and password must be entered.")
         return handleResponse(req, res, 400, null, "Username and Password required.");
       }
+    // Check the user's credentials
     else {
         User.findOne({
             where: { email: req.body.email}
         }).then(data => {
             if (data === null) {
-                console.log("not found");
-                return handleResponse(req, res, 401, null, '');
+                return handleResponse(req, res, 401, null, 'Unrecognized credentials.');
             }
             else {
-                let user = data.dataValues;
-                let hash = data.dataValues.password;
-                bcrypt.compare(req.body.password, hash)
-                    .then(function(result) {
+                let user = data.dataValues;                         // User array (contains unsafe values do not leak!)
+                let hash = data.dataValues.password;                // Create hash of password
+                bcrypt.compare(req.body.password, hash)             // Compare the hashed password
+                    .then(async function(result) {
                         if (result) {
                             // Construct 'client-safe' user variable
-                            const client_safe_user = {
+                            const safe_user = {
                                 'username': user.username,
                                 'name': user.name,
                                 'email': user.email,
                             }
-                            console.log(user);
-                            let token = generateToken(user);
-                            // res.cookie('token', token, {httpOnly: true});
-                            // handleResponse(req,res,200,null,'OK');
-                            return res.json({user: client_safe_user, token});
-                            // newToken.id = user.id;
+                            console.log("User: " + safe_user.username + " authenticated.");
+                            const session_id = uuid.v4()
+                            await tedis.set(safe_user.username, session_id).then(r => {
+                                res.cookie('sid', session_id, {httpOnly: true});
+                                handleResponse(req, res, 200, null, "Success")
+                            })
                         }
                         else {
-                            console.log("Invalid password entered.")
                             handleResponse(req, res, 403, null, "Unrecognized email or password.")
                         }
                 })
-
             }
         })
     }
