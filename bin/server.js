@@ -41,24 +41,27 @@ app.post('/logout', (req, res) => {
 
 // verify the token and return new tokens if it's valid
 app.post('/verify', async function (req, res) {
-    const cookie = req.cookies
     // Check if cookie contains an existing session id
-    if (!cookie.sid) {
+    const session_cookie = req.cookies;
+    if (!session_cookie.sid) {
         return handleResponse(req, res, 401, null, "Fresh session.");
     }
     else {
         // validate session in redis server
-        await tedis.get(cookie.sid)
+        // get ALL cookies stored in redis
+        await tedis.get(session_cookie.sid)
             .then(result => {
-                if (!res) {
+                if (!result) {
                     return handleResponse(req, res, 402, null, "No redis")
                 }
                 else {
-                    return handleResponse(req, res, 402, null, result)
+                    const resp = JSON.parse(result)
+                    // console.log(resp)
+                    return handleResponse(req, res, 200, resp, "OK")
                     }
         })
             .catch(e => {
-                return handleResponse(req, res, 402, null, e)
+                return handleResponse(req, res, 403, null, e)
         })
     }
 
@@ -75,22 +78,24 @@ app.post('/verify', async function (req, res) {
 // });
 
 app.post('/login',(req, res) =>
-    user_ctl.authenticateCredentials(req, res));
+    user_ctl.authenticateCredentials(req, res)
+);
 
 app.listen(PORT, () => {
     console.log('Server started on: ' + PORT);
-});
+    }
+);
 
 app.get('/api', (req, res) => {
     if (!req.cookies.token) return handleResponse(req, res, 401);
     // validate token
     let token = req.cookies.token;
     if (verifyToken(token.token)) {
-    res.send("Welcome " ) }
+        res.send("Welcome " )
+    }
     else {
         res.send("bye")
     }
-
 });
 
 app.post('/register', user_ctl.create);

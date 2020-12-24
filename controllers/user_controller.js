@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
+const moment = require('moment');
 const saltRounds = 10;
 
 const {
@@ -97,27 +98,31 @@ exports.authenticateCredentials = (req, res) => {
                     .then(async function(result) {
                         if (result) {
                             // Construct 'client-safe' user variable
-                            const safe_user = {
+                            console.log("User: " + data.dataValues.username + " authenticated.");
+                            let expiry = moment.max().add(1, 'w')
+                            const session_data = {
                                 'id': user.id,
                                 'username': user.username,
                                 'name': user.name,
                                 'email': user.email,
+                                'expiry': expiry
                             }
-                            console.log("User: " + safe_user.username + " authenticated.");
+                            // Now, we want to create a new session id and store it in redis
                             const session_id = uuid.v4()
-                            await tedis.lpush(safe_user.id, session_id)
+                            let json = JSON.stringify(session_data)
+                            await tedis.set(session_id, json)
                                 .then(result => {
-                                    if (result === "OK") {
+                                    if (result) {
                                         res.cookie('sid', session_id, {httpOnly: true});
-                                        return handleResponse(req, res, 200, null, "Success")
+                                        return handleResponse(req, res, 200, session_data, "Success")
                                     }
                                     else {
-                                        return handleResponse(req, res, 403, null, "Redis error.")
+                                        return handleResponse(req, res, 403, null, "DEBUG: Redis error.")
                                     }
                             })
                                 .catch( e => {
                                     console.log(e);
-                                    return;
+                                    return handleResponse(req, res, 403, null, "DEBUG: Redis error.");
                                 })
                         }
                         else {
