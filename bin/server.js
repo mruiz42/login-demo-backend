@@ -32,12 +32,6 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 // middleware that checks if JWT token exists and verifies it if it does exist.
 // In all private routes, this helps to know if the request is authenticated or not.
 
-// handle user logout
-app.post('/logout', (req, res) => {
-    clearTokens(req, res);
-    return handleResponse(req, res, 204);
-});
-
 
 // verify the token and return new tokens if it's valid
 app.post('/verify', async function (req, res) {
@@ -52,7 +46,7 @@ app.post('/verify', async function (req, res) {
         await tedis.get(session_cookie.sid)
             .then(result => {
                 if (!result) {
-                    return handleResponse(req, res, 402, null, "No redis")
+                    return handleResponse(req, res, 403, null, "No redis")
                 }
                 else {
                     const resp = JSON.parse(result)
@@ -81,6 +75,10 @@ app.post('/login',(req, res) =>
     user_ctl.authenticateCredentials(req, res)
 );
 
+app.post('/logout', (req, res) =>
+{
+   user_ctl.logout(req, res);
+});
 app.listen(PORT, () => {
     console.log('Server started on: ' + PORT);
     }

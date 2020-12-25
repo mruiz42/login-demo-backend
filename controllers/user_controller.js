@@ -78,6 +78,18 @@ exports.findOne = (req, res) => {
     })
 };
 
+exports.logout = (req, res) => {
+    // User wants to logout
+    tedis.del(req.cookies.sid)
+        .then(data => {
+            console.log(data)
+            res.cookie('sid', null, {httpOnly: true});
+            return handleResponse(req, res, 200, null, "Logged out")
+        })
+
+
+}
+
 exports.authenticateCredentials = (req, res) => {
     // If user does not enter a username or password
     if (!req.body.email || !req.body.password) {
